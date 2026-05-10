@@ -1,0 +1,407 @@
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+
+:root {
+  --pastel-bg: #f4f6f5;       /* 눈이 편안한 아주 연한 웜그레이/세이지 배경 */
+  --pastel-card: #ffffff;     
+  --text-main: #444444;       
+  --text-sub: #888888;        
+  
+  --primary: #94b4a4;         /* 눈이 편안한 차분한 세이지 그린 */
+  --primary-hover: #7b998a;   
+  
+  --accent-blue: #b3c5d6;     /* 톤 다운된 블루 */
+  --accent-yellow: #f0e6cc;   /* 부드러운 베이지/옐로우 */
+  --accent-green: #c3d4c3;    
+
+  --shadow-sm: 0 4px 12px rgba(148, 180, 164, 0.1);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.05);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Pretendard', sans-serif;
+}
+
+body {
+  background: #f9faf9; /* 눈부심이 없는 부드러운 오프화이트 배경 */
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+/* 확장된 컨테이너 (화면을 넓게 씁니다) */
+.app-container.expanded {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.8s ease-out;
+  height: 90vh; /* 화면의 90% 높이 사용 */
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.login-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-hover);
+  margin-bottom: 0.5rem;
+}
+
+.pastel-card {
+  background: var(--pastel-card);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 2px solid #fff;
+}
+
+/* 7:3 레이아웃 */
+.large-view {
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  gap: 1.5rem;
+  height: 100%; /* 부모 높이를 꽉 채움 */
+}
+
+.calendar-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------- 달력 상단 ---------------- */
+.calendar-wrapper.large {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+}
+
+.calendar-header-large {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.month-navigation {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  background: var(--pastel-bg);
+  color: var(--primary-hover);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 20px;
+}
+.nav-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.calendar-title {
+  font-size: 1.6rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loading-spinner {
+  font-size: 1.2rem;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* ---------------- 대형 달력 그리드 ---------------- */
+.calendar-grid-large {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(100px, 1fr); /* 각 칸의 최소 높이를 100px로 보장 */
+  gap: 6px;
+  flex: 1; /* 남은 공간 모두 차지 */
+}
+
+.calendar-day-header {
+  font-weight: 600;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+  text-align: center;
+  height: 24px;
+}
+
+.calendar-day-cell {
+  background: #fdfdfd;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.2s;
+  overflow: hidden; /* 칸을 넘어가는 내용 숨김 */
+}
+
+.calendar-day-cell.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.calendar-day-cell:hover:not(.empty) {
+  border-color: var(--primary);
+  background: var(--pastel-bg);
+}
+
+.calendar-day-cell.selected {
+  border: 2px solid var(--primary);
+  background: #fffafa;
+}
+
+.day-number {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  text-align: right;
+  margin-bottom: 2px;
+}
+
+.calendar-day-cell.today .day-number {
+  color: var(--primary-hover);
+  font-weight: 700;
+}
+
+/* ---------------- 일정 칩 (달력 내부) ---------------- */
+.event-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto; /* 일정이 많으면 스크롤 */
+  scrollbar-width: none; /* 스크롤바 숨김 (Firefox) */
+}
+.event-chips::-webkit-scrollbar { display: none; /* 스크롤바 숨김 (Chrome) */ }
+
+.event-chip {
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 글씨가 길면 ... 처리 */
+}
+
+.event-chip.done {
+  background: #e0e0e0;
+  color: #616161;
+  text-decoration: line-through;
+}
+
+/* ---------------- 우측 사이드바 ---------------- */
+.sidebar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+}
+
+.schedule-list-header {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px dashed #ffebee;
+}
+
+.sidebar-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding-right: 5px;
+}
+.sidebar-scroll-area::-webkit-scrollbar { width: 6px; }
+.sidebar-scroll-area::-webkit-scrollbar-thumb { background: #ffebee; border-radius: 4px; }
+
+.schedule-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.8rem;
+  background: #fafafa;
+  border-radius: var(--radius-md);
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+.schedule-item:hover {
+  border-color: var(--primary);
+}
+
+.schedule-item.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+  cursor: default;
+}
+
+.schedule-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.schedule-time {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+/* ---------------- 빠른 추가 영역 ---------------- */
+.sidebar-add {
+  margin-top: auto;
+}
+
+.quick-add-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-pastel {
+  flex: 1;
+  padding: 0.8rem;
+  border: 2px solid #ffebee;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-pastel:focus {
+  border-color: var(--primary);
+}
+
+.btn {
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.btn-action {
+  background: #fdfdfd;
+  color: var(--primary-hover);
+  border: 1px solid #ffebee;
+  flex: 1; /* 버튼들이 가로 길이를 나눠가짐 */
+  padding: 0.6rem;
+  font-size: 0.85rem;
+}
+.btn-action:hover {
+  background: var(--pastel-bg);
+  border-color: var(--primary);
+}
+
+.quick-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2열로 배치 */
+  gap: 0.5rem;
+}
+
+/* 반응형 모바일 */
+@media (max-width: 900px) {
+  .large-view {
+    grid-template-columns: 1fr; /* 세로로 쌓임 */
+    height: auto;
+  }
+  .app-container.expanded {
+    height: auto;
+  }
+  .calendar-grid-large {
+    grid-auto-rows: minmax(70px, auto);
+  }
+}
+
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.logout-btn {
+  background: #f5f5f5;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--text-sub);
+}
+.logout-btn:hover { background: #e0e0e0; }
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--primary-hover);
+}
+.icon-btn:hover { color: var(--primary); transform: scale(1.1); }
